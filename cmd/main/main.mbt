@@ -10,7 +10,7 @@ fn main {
   println("moonbit-customer: \{report.customers.length()} customers")
   for customer in report.customers {
     println(
-      "\{customer.customer_id}: \{to_repr(customer.segment)} — \{customer.explanation}",
+      "\{customer.customer_id}: \{Repr(customer.segment)} — \{customer.explanation}",
     )
   }
 }
