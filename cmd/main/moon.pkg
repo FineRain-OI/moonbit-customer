@@ -1,0 +1,7 @@
+import {
+  "rx123/moonbit-customer" @customer,
+}
+
+options(
+  "is-main": true,
+)
