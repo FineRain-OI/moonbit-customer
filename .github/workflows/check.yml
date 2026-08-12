@@ -23,4 +23,6 @@ jobs:
         run: |
           moon check --deny-warn
           moon test --deny-warn
+          moon check --target native --deny-warn
+          moon test --target native --deny-warn
           moon run cmd/main
