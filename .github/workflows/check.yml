@@ -1,0 +1,26 @@
+name: MoonBit check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      - name: Format and API checks
+        run: |
+          if moon fmt --help | grep -q -- '--deny-warn'; then moon fmt --deny-warn; else moon fmt --check; fi
+          if moon info --help | grep -q -- '--deny-warn'; then moon info --deny-warn; else moon info; fi
+          git diff --exit-code
+      - name: Check and test
+        run: |
+          moon check --deny-warn
+          moon test --deny-warn
+          moon run cmd/main
