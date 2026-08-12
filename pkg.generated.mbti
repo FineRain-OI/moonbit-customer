@@ -1,0 +1,101 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "rx123/moonbit-customer"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn analyze(Array[Event], Int) -> Report
+
+pub fn clean_events(Array[Event]) -> CleaningSummary
+
+pub fn cohort_retention(Array[Event], Int, Int) -> Array[CohortRow]
+
+pub fn estimate_lifetime_value(CustomerMetrics) -> ValueEstimate
+
+pub fn score_churn(CustomerMetrics, ScoringConfig) -> ChurnScore
+
+pub fn summarize(Report) -> PortfolioSummary
+
+// Errors
+
+// Types and methods
+pub struct ChurnScore {
+  score : Int
+  reasons : Array[String]
+}
+
+pub struct CleaningSummary {
+  accepted : Array[Event]
+  rejected : Int
+}
+
+pub struct CohortRow {
+  cohort_day : Int
+  period : Int
+  cohort_size : Int
+  active_customers : Int
+  retention_percent : Int
+}
+
+pub struct CustomerMetrics {
+  customer_id : String
+  first_day : Int
+  last_day : Int
+  recency : Int
+  frequency : Int
+  monetary : Int
+  r_score : Int
+  f_score : Int
+  m_score : Int
+  segment : Segment
+  explanation : String
+}
+
+pub struct Event {
+  customer_id : String
+  day : Int
+  amount : Int
+}
+pub fn Event::new(String, Int, Int) -> Self
+
+pub struct PortfolioSummary {
+  total_customers : Int
+  repeat_customers : Int
+  total_value : Int
+  average_value : Int
+  segment_counts : Array[(Segment, Int)]
+}
+
+pub struct Report {
+  customers : Array[CustomerMetrics]
+}
+
+pub struct ScoringConfig {
+  at_risk_days : Int
+  dormant_days : Int
+  repeat_bonus : Int
+  high_value_threshold : Int
+}
+pub fn ScoringConfig::default() -> Self
+
+pub enum Segment {
+  New
+  AtRisk
+  Loyal
+  Champions
+  Dormant
+} derive(Eq, @debug.Debug)
+
+pub struct ValueEstimate {
+  average_order : Int
+  repeat_interval : Int
+  expected_orders : Int
+  estimated_value : Int
+}
+
+// Type aliases
+
+// Traits
+
