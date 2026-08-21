@@ -1,12 +1,20 @@
 # moonbit-customer
 
-面向客户关系管理的可解释客户价值分析库。它把交易/价值事件整理成稳定的领域模型，提供 RFM、客户分层、cohort 留存、生命周期价值估计和流失风险评分，默认不依赖大型机器学习框架。
+面向 MoonBit 应用的可解释客户价值分析库。它把有序客户事件转化为可审计的 RFM 指标、cohort 留存、生命周期价值、流失原因、漏斗转化、日趋势和运营策略。
 
-## 为什么是 MoonBit
+## 核心能力
 
-项目把规则、数据结构和可测试的分析管道作为 MoonBit 生态中的可复用基础能力。MoonFrame/pandas 适合通用表格处理，本项目则专注客户事件语义：指标边界、规则解释、留存口径和未来统计模型的替换接口。
+- 事件校验：记录空客户标识、非法日期/金额、未来事件和重复事件的索引与原因。
+- RFM、五类可解释分群、可配置流失评分和透明的生命周期价值估计。
+- Cohort 留存、客户漏斗、日价值趋势、运营洞察和阈值策略目录。
+- 核心包不绑定数据库、CSV 解析器、机器学习运行时或大型框架；调用方自行选择输入适配和日期/金额单位。
 
 ## 快速开始
+
+```bash
+moon test
+moon run cmd/main
+```
 
 ```mbt check
 ///|
@@ -23,29 +31,37 @@ test "README example" {
 }
 ```
 
-运行示例：
+## CLI
 
-```bash
-moon run cmd/main
-moon test --deny-warn
-moon fmt --deny-warn
-moon info --deny-warn
+运行 `moon run cmd/main` 可查看分析示例，并对仓库内固定种子的基准负载执行完整分析管道。
+
+## 架构
+
+根包拥有公共领域类型和确定性算法；校验与分析分离，确保输入问题可追踪。`insights.mbt` 组合底层结果形成运营动作，`playbooks.mbt` 保存可审阅的阈值策略，`cmd/main` 仅作为轻量可运行示例。
+
+## 基准
+
+仓库包含 1,200 条固定种子的基准负载，覆盖 240 个客户、365 个日期值、四个渠道标签、零值与接近上限的金额以及重复活动。它是明确标注的合成负载，不冒充生产客户数据。运行 `moon run cmd/main` 可复现：
+
+```text
+benchmark: cases=1200, customers=240, value=301680, retention_rows=1080
+benchmark checksum: 312524015
 ```
 
-## API 边界
+## 测试
 
-- `Event` / `clean_events`：输入规范化和可审计的拒绝计数。
-- `analyze`：RFM 指标、评分、分层和解释文案。
-- `cohort_retention`：按首次活动日生成相对周期留存表。
-- `estimate_lifetime_value`：以平均订单额和重复间隔作透明估计。
-- `score_churn`：使用可配置阈值，返回 0–100 分和原因数组。
+当前测试套件包含 961 个测试，覆盖校验边界矩阵、单次订单洞察，以及基准、质量发现、漏斗、趋势和策略目录的集成场景。
 
-所有金额和日期使用整数，调用方可自行决定货币最小单位与日期编码；这使核心库不绑定地区、数据库或具体 CSV 格式。
+```bash
+moon check --deny-warn
+moon test --deny-warn
+moon test --target native --deny-warn
+```
 
-## 开发状态
+## CI
 
-当前版本覆盖第一阶段的清洗、RFM、分层、cohort 与可解释评分。后续将增加 CSV/JSON 适配层、留存曲线导出、营销活动评估和可插拔统计模型。详见 [CHANGELOG.md](CHANGELOG.md)。
+GitHub Actions 安装当前 stable MoonBit CLI，检查格式和生成接口，拒绝编译警告，运行 wasm-gc/native 测试，执行 CLI，并校验确定性基准输出。详见 `.github/workflows/check.yml`。
 
-## 许可
+## 许可证
 
 Apache-2.0，见 [LICENSE](LICENSE)。

@@ -8,19 +8,56 @@ import {
 // Values
 pub fn analyze(Array[Event], Int) -> Report
 
+pub fn analyze_funnel(Array[FunnelStep]) -> FunnelReport
+
+pub fn applicable_playbooks(CustomerInsight, Array[Playbook]) -> Array[Playbook]
+
+pub fn benchmark_case_count() -> Int
+
+pub fn benchmark_checksum() -> Int
+
+pub fn benchmark_events() -> Array[Event]
+
+pub fn build_insight(CustomerMetrics, ScoringConfig) -> CustomerInsight
+
 pub fn clean_events(Array[Event]) -> CleaningSummary
 
 pub fn cohort_retention(Array[Event], Int, Int) -> Array[CohortRow]
 
+pub fn daily_values(Array[Event]) -> Array[DailyValue]
+
 pub fn estimate_lifetime_value(CustomerMetrics) -> ValueEstimate
+
+pub fn funnel_step(String, Array[String]) -> FunnelStep
+
+pub fn insights(Report, ScoringConfig) -> Array[CustomerInsight]
+
+pub fn rank_insights(Array[CustomerInsight]) -> Array[CustomerInsight]
+
+pub fn retention_playbooks() -> Array[Playbook]
+
+pub fn run_benchmark_workload() -> (Int, Int, Int, Int)
 
 pub fn score_churn(CustomerMetrics, ScoringConfig) -> ChurnScore
 
+pub fn select_priority(Array[CustomerInsight], Int) -> Array[CustomerInsight]
+
 pub fn summarize(Report) -> PortfolioSummary
+
+pub fn summarize_trend(Array[DailyValue]) -> TrendSummary
+
+pub fn validate_events(Array[Event], Int) -> QualityReport
 
 // Errors
 
 // Types and methods
+pub struct BenchmarkCase {
+  customer_id : String
+  day : Int
+  amount : Int
+  channel : String
+}
+
 pub struct ChurnScore {
   score : Int
   reasons : Array[String]
@@ -39,6 +76,16 @@ pub struct CohortRow {
   retention_percent : Int
 }
 
+pub struct CustomerInsight {
+  customer_id : String
+  scores : ScoreVector
+  segment : Segment
+  churn : ChurnScore
+  lifetime : ValueEstimate
+  priority : Int
+  actions : Array[String]
+}
+
 pub struct CustomerMetrics {
   customer_id : String
   first_day : Int
@@ -53,12 +100,45 @@ pub struct CustomerMetrics {
   explanation : String
 }
 
+pub struct DailyValue {
+  day : Int
+  orders : Int
+  customers : Int
+  value : Int
+  average_order : Int
+}
+
 pub struct Event {
   customer_id : String
   day : Int
   amount : Int
 }
 pub fn Event::new(String, Int, Int) -> Self
+
+pub struct FunnelReport {
+  rows : Array[FunnelRow]
+  overall_conversion_percent : Int
+}
+
+pub struct FunnelRow {
+  name : String
+  entered : Int
+  conversion_percent : Int
+  drop_off : Int
+}
+
+pub struct FunnelStep {
+  name : String
+  customers : Array[String]
+}
+
+pub struct Playbook {
+  code : String
+  priority : Int
+  max_recency : Int
+  min_frequency : Int
+  action : String
+}
 
 pub struct PortfolioSummary {
   total_customers : Int
@@ -68,8 +148,42 @@ pub struct PortfolioSummary {
   segment_counts : Array[(Segment, Int)]
 }
 
+pub struct QualityFinding {
+  index : Int
+  issue : QualityIssue
+  customer_id : String
+  message : String
+}
+
+pub enum QualityIssue {
+  EmptyCustomerId
+  NegativeDay
+  NegativeAmount
+  FutureEvent
+  DuplicateEvent
+} derive(Eq, @debug.Debug)
+
+pub struct QualityReport {
+  accepted : Array[Event]
+  findings : Array[QualityFinding]
+  unique_customers : Int
+  total_value : Int
+}
+pub fn QualityReport::duplicate_count(Self) -> Int
+pub fn QualityReport::empty_customer_count(Self) -> Int
+pub fn QualityReport::future_event_count(Self) -> Int
+pub fn QualityReport::is_clean(Self) -> Bool
+pub fn QualityReport::issue_count(Self, QualityIssue) -> Int
+
 pub struct Report {
   customers : Array[CustomerMetrics]
+}
+
+pub struct ScoreVector {
+  recency : Int
+  frequency : Int
+  monetary : Int
+  composite : Int
 }
 
 pub struct ScoringConfig {
@@ -87,6 +201,21 @@ pub enum Segment {
   Champions
   Dormant
 } derive(Eq, @debug.Debug)
+
+pub enum TrendDirection {
+  Rising
+  Falling
+  Flat
+} derive(Eq, @debug.Debug)
+
+pub struct TrendSummary {
+  direction : TrendDirection
+  first_value : Int
+  last_value : Int
+  change_percent : Int
+}
+pub fn TrendSummary::is_falling(Self) -> Bool
+pub fn TrendSummary::is_rising(Self) -> Bool
 
 pub struct ValueEstimate {
   average_order : Int

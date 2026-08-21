@@ -13,4 +13,9 @@ fn main {
       "\{customer.customer_id}: \{Repr(customer.segment)} — \{customer.explanation}",
     )
   }
+  let benchmark = @customer.run_benchmark_workload()
+  println(
+    "benchmark: cases=\{@customer.benchmark_case_count()}, customers=\{benchmark.0}, value=\{benchmark.1}, retention_rows=\{benchmark.2}",
+  )
+  println("benchmark checksum: \{@customer.benchmark_checksum()}")
 }

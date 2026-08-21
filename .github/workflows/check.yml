@@ -1,28 +1,44 @@
-name: MoonBit check
+name: MoonBit quality
 
 on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   check:
+    name: Stable MoonBit checks
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install MoonBit
+      - name: Install current stable MoonBit
+        shell: bash
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
-      - name: Format and API checks
+      - name: Toolchain version
+        run: moon version
+      - name: Format and generated API are clean
         run: |
-          if moon fmt --help | grep -q -- '--deny-warn'; then moon fmt --deny-warn; else moon fmt --check; fi
-          if moon info --help | grep -q -- '--deny-warn'; then moon info --deny-warn; else moon info; fi
+          moon fmt --check
+          moon info
           git diff --exit-code
-      - name: Check and test
+      - name: Check and test wasm-gc
         run: |
           moon check --deny-warn
-          moon test --deny-warn
+          moon test --deny-warn --enable-coverage
+          moon coverage report -f summary
+      - name: Check and test native
+        run: |
           moon check --target native --deny-warn
-          moon test --target native --deny-warn
-          moon run cmd/main
+          moon test --target native --deny-warn --enable-coverage
+      - name: CLI and benchmark smoke test
+        shell: bash
+        run: |
+          output="$(moon run cmd/main)"
+          printf '%s\n' "$output"
+          grep -F 'benchmark: cases=1200, customers=240, value=301680, retention_rows=1080' <<< "$output"
+          grep -F 'benchmark checksum: 312524015' <<< "$output"
