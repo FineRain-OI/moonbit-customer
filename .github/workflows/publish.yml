@@ -20,9 +20,9 @@ jobs:
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
       - name: Pre-publish checks
         run: |
-          moon version
-          moon check --deny-warn
-          moon test --deny-warn
+          moon version --all
+          moon check --target all --deny-warn
+          moon test --target all --deny-warn
       - name: Publish to Mooncakes
         env:
           MOONCAKES_TOKEN: ${{ secrets.MOONCAKES_TOKEN }}

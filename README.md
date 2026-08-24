@@ -6,7 +6,8 @@ Explainable customer-value analytics for MoonBit applications. The library turns
 
 - Deterministic event validation with indexed findings for empty IDs, invalid dates/amounts, future rows, and duplicates.
 - RFM metrics, five explainable segments, configurable churn scoring, and transparent lifetime-value estimates.
-- Cohort retention, customer funnels, daily value trends, operational insights, and a threshold-based playbook catalog.
+- Cohort retention, value-aware retention curves, customer funnels, daily value trends, and reactivation candidates.
+- Channel attribution (first, last, linear, and time-weighted), campaign ROI, budget allocation, product affinity, lifecycle journeys, forecasting, experiments, operational insights, and a data-driven playbook catalog.
 - No database, CSV parser, machine-learning runtime, or framework dependency in the core package; callers choose their own ingestion and date/amount units.
 
 ## Quick start
@@ -17,10 +18,10 @@ moon run cmd/main
 ```
 
 ```mbt
-let report = @rx123/moonbit-customer.analyze(
+let report = @wx-se884/moonbit-customer.analyze(
   [
-    @rx123/moonbit-customer.Event::new("alice", 10, 120),
-    @rx123/moonbit-customer.Event::new("alice", 20, 80),
+    @wx-se884/moonbit-customer.Event::new("alice", 10, 120),
+    @wx-se884/moonbit-customer.Event::new("alice", 20, 80),
   ],
   30,
 )
@@ -35,7 +36,7 @@ The CLI prints a small analysis example and executes the same library pipeline o
 
 ## Architecture
 
-The root package owns the public domain types and deterministic algorithms. Validation is separated from analysis so ingestion errors remain observable. `insights.mbt` composes the lower-level results into operational actions; `playbooks.mbt` contains reviewable threshold policies. `cmd/main` is intentionally a thin executable example.
+The root package owns public domain types and deterministic algorithms. Validation is separated from analysis so ingestion errors remain observable. Attribution and campaign modules turn events into marketing evidence; retention and allocation modules turn evidence into bounded actions. `insights.mbt` composes lower-level results, while `playbooks.mbt` stores reviewable data-driven policies. `cmd/main` is intentionally a thin executable example.
 
 ## Benchmark
 
@@ -50,13 +51,15 @@ Reproduce it with `moon run cmd/main`. The integration test asserts the cardinal
 
 ## Tests
 
-The suite includes 961 tests, including a generated boundary matrix for validation and single-order insight behavior, plus integration tests for the benchmark, quality findings, funnels, trends, and playbooks.
+The suite contains 23 deterministic test cases. Two data-driven matrices exercise 950 validation and single-order insight combinations at runtime, alongside integration tests for the benchmark, quality findings, funnels, trends, attribution, campaigns, allocation, retention, product affinity, forecasting, experiments, and playbooks.
 
 ```bash
 moon check --deny-warn
 moon test --deny-warn
 moon test --target native --deny-warn
 ```
+
+The supported local toolchain is MoonBit stable with `moonc >= v0.10.9`.
 
 ## CI
 

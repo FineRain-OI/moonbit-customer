@@ -6,7 +6,8 @@
 
 - 事件校验：记录空客户标识、非法日期/金额、未来事件和重复事件的索引与原因。
 - RFM、五类可解释分群、可配置流失评分和透明的生命周期价值估计。
-- Cohort 留存、客户漏斗、日价值趋势、运营洞察和阈值策略目录。
+- Cohort 留存、价值留存曲线、客户漏斗、日价值趋势和再激活候选。
+- 渠道归因、营销活动 ROI、预算分配、商品关联、生命周期、预测、实验评估、运营洞察和数据驱动策略目录。
 - 核心包不绑定数据库、CSV 解析器、机器学习运行时或大型框架；调用方自行选择输入适配和日期/金额单位。
 
 ## 快速开始
@@ -19,10 +20,10 @@ moon run cmd/main
 ```mbt check
 ///|
 test "README example" {
-  let report = @rx123/moonbit-customer.analyze(
+  let report = @wx-se884/moonbit-customer.analyze(
     [
-      @rx123/moonbit-customer.Event::new("alice", 10, 120),
-      @rx123/moonbit-customer.Event::new("alice", 20, 80),
+      @wx-se884/moonbit-customer.Event::new("alice", 10, 120),
+      @wx-se884/moonbit-customer.Event::new("alice", 20, 80),
     ],
     30,
   )
@@ -37,7 +38,7 @@ test "README example" {
 
 ## 架构
 
-根包拥有公共领域类型和确定性算法；校验与分析分离，确保输入问题可追踪。`insights.mbt` 组合底层结果形成运营动作，`playbooks.mbt` 保存可审阅的阈值策略，`cmd/main` 仅作为轻量可运行示例。
+根包拥有公共领域类型和确定性算法；校验与分析分离，确保输入问题可追踪。归因、活动、留存和分配模块把事件转化为可解释的运营证据，`insights.mbt` 组合底层结果，`playbooks.mbt` 保存数据驱动的可审阅策略，`cmd/main` 仅作为轻量可运行示例。
 
 ## 基准
 
@@ -50,13 +51,15 @@ benchmark checksum: 312524015
 
 ## 测试
 
-当前测试套件包含 961 个测试，覆盖校验边界矩阵、单次订单洞察，以及基准、质量发现、漏斗、趋势和策略目录的集成场景。
+当前测试套件包含 23 个确定性测试用例；其中两个数据驱动矩阵在运行时覆盖 950 组校验和单次订单洞察组合，并补充基准、质量发现、漏斗、趋势、归因、活动、分配、留存、商品关联、预测、实验评估和策略目录的集成场景。
 
 ```bash
 moon check --deny-warn
 moon test --deny-warn
 moon test --target native --deny-warn
 ```
+
+本地支持的工具链为 MoonBit stable，要求 `moonc >= v0.10.9`。
 
 ## CI
 

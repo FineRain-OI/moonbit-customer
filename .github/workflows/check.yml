@@ -20,7 +20,14 @@ jobs:
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
       - name: Toolchain version
-        run: moon version
+        shell: bash
+        run: |
+          toolchain="$(moon version --all)"
+          printf '%s\n' "$toolchain"
+          if ! grep -Eq 'moonc v0\.10\.(9|[1-9][0-9])([+[:space:]]|$)' <<< "$toolchain"; then
+            echo "MoonBit stable toolchain must provide moonc >= v0.10.9"
+            exit 1
+          fi
       - name: Format and generated API are clean
         run: |
           moon fmt --check
@@ -28,17 +35,16 @@ jobs:
           git diff --exit-code
       - name: Check and test wasm-gc
         run: |
-          moon check --deny-warn
-          moon test --deny-warn --enable-coverage
+          moon check --target all --deny-warn
+          moon test --target all --deny-warn --enable-coverage
           moon coverage report -f summary
-      - name: Check and test native
-        run: |
-          moon check --target native --deny-warn
-          moon test --target native --deny-warn --enable-coverage
       - name: CLI and benchmark smoke test
         shell: bash
         run: |
-          output="$(moon run cmd/main)"
-          printf '%s\n' "$output"
-          grep -F 'benchmark: cases=1200, customers=240, value=301680, retention_rows=1080' <<< "$output"
-          grep -F 'benchmark checksum: 312524015' <<< "$output"
+          for target in wasm wasm-gc js native; do
+            echo "--- CLI $target ---"
+            output="$(moon run cmd/main --target "$target")"
+            printf '%s\n' "$output"
+            grep -F 'benchmark: cases=1200, customers=240, value=301680, retention_rows=1080' <<< "$output"
+            grep -F 'benchmark checksum: 312524015' <<< "$output"
+          done

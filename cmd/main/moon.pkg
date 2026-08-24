@@ -1,5 +1,5 @@
 import {
-  "rx123/moonbit-customer" @customer,
+  "wx-se884/moonbit-customer" @customer,
 }
 
 pkgtype(kind: "executable")

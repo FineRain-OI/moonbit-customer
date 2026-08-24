@@ -1,16 +1,22 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "rx123/moonbit-customer"
+package "wx-se884/moonbit-customer"
 
 import {
   "moonbitlang/core/debug",
 }
 
 // Values
+pub fn allocate_budget(Array[AllocationRequest], Int, Int) -> AllocationPlan
+
 pub fn analyze(Array[Event], Int) -> Report
+
+pub fn analyze_attribution(Array[Event], Array[Touchpoint], AttributionModel) -> AttributionReport
 
 pub fn analyze_funnel(Array[FunnelStep]) -> FunnelReport
 
 pub fn applicable_playbooks(CustomerInsight, Array[Playbook]) -> Array[Playbook]
+
+pub fn attribution_models() -> Array[AttributionModel]
 
 pub fn benchmark_case_count() -> Int
 
@@ -18,27 +24,69 @@ pub fn benchmark_checksum() -> Int
 
 pub fn benchmark_events() -> Array[Event]
 
+pub fn best_playbook(CustomerInsight, Array[Playbook]) -> Playbook?
+
 pub fn build_insight(CustomerMetrics, ScoringConfig) -> CustomerInsight
 
 pub fn clean_events(Array[Event]) -> CleaningSummary
 
 pub fn cohort_retention(Array[Event], Int, Int) -> Array[CohortRow]
 
+pub fn compare_values(Int, Int) -> ValueChange
+
+pub fn customers_in_stage(Array[JourneySnapshot], JourneyStage) -> Array[JourneySnapshot]
+
 pub fn daily_values(Array[Event]) -> Array[DailyValue]
 
+pub fn dormant_customer_count(Array[JourneySnapshot]) -> Int
+
 pub fn estimate_lifetime_value(CustomerMetrics) -> ValueEstimate
+
+pub fn evaluate_campaign(String, Array[CampaignExposure], Array[CampaignOutcome], Int) -> CampaignResult
+
+pub fn evaluate_campaigns(Array[String], Array[CampaignExposure], Array[CampaignOutcome], Int) -> Array[CampaignResult]
+
+pub fn evaluate_experiment(ExperimentArm, Array[ExperimentArm]) -> Array[ExperimentResult]
+
+pub fn forecast(Array[Int], ForecastConfig) -> Array[ForecastPoint]
 
 pub fn funnel_step(String, Array[String]) -> FunnelStep
 
 pub fn insights(Report, ScoringConfig) -> Array[CustomerInsight]
 
+pub fn iqr_outliers(Array[Int]) -> Array[Int]
+
+pub fn journey_snapshots(Report, Int) -> Array[JourneySnapshot]
+
+pub fn journey_transitions(Array[JourneySnapshot], Array[JourneySnapshot]) -> Array[JourneyTransition]
+
+pub fn percentile(Array[Int], Int) -> Int
+
+pub fn product_affinity(Array[ProductEvent]) -> Array[ProductPair]
+
+pub fn product_metrics(Array[ProductEvent]) -> Array[ProductMetric]
+
+pub fn rank_campaigns(Array[CampaignResult]) -> Array[CampaignResult]
+
+pub fn rank_channel_credit(AttributionReport) -> Array[ChannelCredit]
+
+pub fn rank_experiment_results(Array[ExperimentResult]) -> Array[ExperimentResult]
+
 pub fn rank_insights(Array[CustomerInsight]) -> Array[CustomerInsight]
 
+pub fn reactivation_candidates(Report, Int, Int) -> Array[ReactivationCandidate]
+
+pub fn repeat_customer_count(Array[JourneySnapshot]) -> Int
+
 pub fn retention_playbooks() -> Array[Playbook]
+
+pub fn rolling_mean(Array[Int], Int) -> Array[Int]
 
 pub fn run_benchmark_workload() -> (Int, Int, Int, Int)
 
 pub fn score_churn(CustomerMetrics, ScoringConfig) -> ChurnScore
+
+pub fn score_forecast(Array[Int], Array[Int]) -> ForecastScore
 
 pub fn select_priority(Array[CustomerInsight], Int) -> Array[CustomerInsight]
 
@@ -46,16 +94,94 @@ pub fn summarize(Report) -> PortfolioSummary
 
 pub fn summarize_trend(Array[DailyValue]) -> TrendSummary
 
+pub fn summarize_values(Array[Int]) -> NumericSummary
+
+pub fn top_products(Array[ProductMetric], Int) -> Array[ProductMetric]
+
 pub fn validate_events(Array[Event], Int) -> QualityReport
+
+pub fn value_retention_curve(Array[Event], Int, Int, Int) -> RetentionSummary
 
 // Errors
 
 // Types and methods
+pub struct AllocationLine {
+  campaign : String
+  customers : Int
+  spend : Int
+  expected_value : Int
+  expected_roi_percent : Int
+}
+
+pub struct AllocationPlan {
+  lines : Array[AllocationLine]
+  customers : Int
+  spend : Int
+  expected_value : Int
+  remaining_budget : Int
+}
+
+pub struct AllocationRequest {
+  campaign : String
+  audience : Int
+  cost_per_customer : Int
+  expected_value_per_customer : Int
+  priority : Int
+}
+pub fn AllocationRequest::new(String, Int, Int, Int, Int) -> Self
+
+pub enum AttributionModel {
+  FirstTouch
+  LastTouch
+  Linear
+  TimeWeighted
+} derive(Eq, @debug.Debug)
+
+pub struct AttributionReport {
+  credits : Array[ChannelCredit]
+  total_value : Int
+  total_cost : Int
+}
+
 pub struct BenchmarkCase {
   customer_id : String
   day : Int
   amount : Int
   channel : String
+}
+
+pub struct CampaignExposure {
+  campaign : String
+  customer_id : String
+  day : Int
+  cost : Int
+}
+pub fn CampaignExposure::new(String, String, Int, Int) -> Self
+
+pub struct CampaignOutcome {
+  customer_id : String
+  day : Int
+  value : Int
+}
+pub fn CampaignOutcome::new(String, Int, Int) -> Self
+
+pub struct CampaignResult {
+  campaign : String
+  exposed_customers : Int
+  converted_customers : Int
+  conversion_percent : Int
+  attributed_value : Int
+  cost : Int
+  roi_percent : Int
+  average_value : Int
+}
+
+pub struct ChannelCredit {
+  channel : String
+  touches : Int
+  credited_value : Int
+  cost : Int
+  roi_percent : Int
 }
 
 pub struct ChurnScore {
@@ -115,6 +241,45 @@ pub struct Event {
 }
 pub fn Event::new(String, Int, Int) -> Self
 
+pub struct ExperimentArm {
+  experiment : String
+  arm : String
+  customers : Int
+  conversions : Int
+  value : Int
+}
+pub fn ExperimentArm::new(String, String, Int, Int, Int) -> Self
+
+pub struct ExperimentResult {
+  experiment : String
+  arm : String
+  conversion_percent : Int
+  average_value : Int
+  lift_percent : Int
+  is_winner : Bool
+}
+
+pub struct ForecastConfig {
+  window : Int
+  horizon : Int
+  safety_percent : Int
+}
+pub fn ForecastConfig::default() -> Self
+pub fn ForecastConfig::new(Int, Int, Int) -> Self
+
+pub struct ForecastPoint {
+  period : Int
+  prediction : Int
+  lower_bound : Int
+  upper_bound : Int
+}
+
+pub struct ForecastScore {
+  mean_absolute_error : Int
+  bias : Int
+  observations : Int
+}
+
 pub struct FunnelReport {
   rows : Array[FunnelRow]
   overall_conversion_percent : Int
@@ -132,12 +297,47 @@ pub struct FunnelStep {
   customers : Array[String]
 }
 
+pub struct JourneySnapshot {
+  customer_id : String
+  stage : JourneyStage
+  day : Int
+  value : Int
+  reason : String
+}
+
+pub enum JourneyStage {
+  Prospect
+  Activated
+  Engaged
+  Repeat
+  AtRiskJourney
+  DormantJourney
+} derive(Eq, @debug.Debug)
+
+pub struct JourneyTransition {
+  from : JourneyStage
+  to : JourneyStage
+  customers : Int
+}
+
+pub struct NumericSummary {
+  count : Int
+  total : Int
+  minimum : Int
+  maximum : Int
+  mean : Int
+  median : Int
+  lower_quartile : Int
+  upper_quartile : Int
+}
+
 pub struct Playbook {
   code : String
   priority : Int
   max_recency : Int
   min_frequency : Int
   action : String
+  rationale : String
 }
 
 pub struct PortfolioSummary {
@@ -146,6 +346,32 @@ pub struct PortfolioSummary {
   total_value : Int
   average_value : Int
   segment_counts : Array[(Segment, Int)]
+}
+
+pub struct ProductEvent {
+  customer_id : String
+  product_id : String
+  day : Int
+  amount : Int
+  quantity : Int
+}
+pub fn ProductEvent::new(String, String, Int, Int, Int) -> Self
+
+pub struct ProductMetric {
+  product_id : String
+  customers : Int
+  orders : Int
+  revenue : Int
+  units : Int
+  repeat_rate : Int
+  average_order : Int
+}
+
+pub struct ProductPair {
+  left : String
+  right : String
+  shared_customers : Int
+  support_percent : Int
 }
 
 pub struct QualityFinding {
@@ -175,8 +401,33 @@ pub fn QualityReport::future_event_count(Self) -> Int
 pub fn QualityReport::is_clean(Self) -> Bool
 pub fn QualityReport::issue_count(Self, QualityIssue) -> Int
 
+pub struct ReactivationCandidate {
+  customer_id : String
+  recency : Int
+  frequency : Int
+  monetary : Int
+  priority : Int
+  reason : String
+}
+
 pub struct Report {
   customers : Array[CustomerMetrics]
+}
+
+pub struct RetentionPoint {
+  period : Int
+  cohort_size : Int
+  active_customers : Int
+  retention_percent : Int
+  value : Int
+}
+
+pub struct RetentionSummary {
+  points : Array[RetentionPoint]
+  starting_value : Int
+  ending_value : Int
+  value_change_percent : Int
+  retained_customers : Int
 }
 
 pub struct ScoreVector {
@@ -202,6 +453,14 @@ pub enum Segment {
   Dormant
 } derive(Eq, @debug.Debug)
 
+pub struct Touchpoint {
+  customer_id : String
+  channel : String
+  day : Int
+  cost : Int
+}
+pub fn Touchpoint::new(String, String, Int, Int) -> Self
+
 pub enum TrendDirection {
   Rising
   Falling
@@ -216,6 +475,14 @@ pub struct TrendSummary {
 }
 pub fn TrendSummary::is_falling(Self) -> Bool
 pub fn TrendSummary::is_rising(Self) -> Bool
+
+pub struct ValueChange {
+  baseline : Int
+  current : Int
+  absolute : Int
+  percent : Int
+  direction : TrendDirection
+}
 
 pub struct ValueEstimate {
   average_order : Int
