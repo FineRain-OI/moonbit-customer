@@ -18,10 +18,10 @@ moon run cmd/main
 ```
 
 ```mbt
-let report = @wx-se884/moonbit-customer.analyze(
+let report = @FineRain-OI/moonbit-customer.analyze(
   [
-    @wx-se884/moonbit-customer.Event::new("alice", 10, 120),
-    @wx-se884/moonbit-customer.Event::new("alice", 20, 80),
+    @FineRain-OI/moonbit-customer.Event::new("alice", 10, 120),
+    @FineRain-OI/moonbit-customer.Event::new("alice", 20, 80),
   ],
   30,
 )

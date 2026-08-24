@@ -1,5 +1,5 @@
 import {
-  "wx-se884/moonbit-customer" @customer,
+  "FineRain-OI/moonbit-customer" @customer,
 }
 
 pkgtype(kind: "executable")

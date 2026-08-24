@@ -1,4 +1,4 @@
-name = "wx-se884/moonbit-customer"
+name = "FineRain-OI/moonbit-customer"
 
 version = "0.2.0"
 
